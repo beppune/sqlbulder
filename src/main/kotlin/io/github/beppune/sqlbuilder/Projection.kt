@@ -34,6 +34,15 @@ class ConcatProjection(val projections: List<Projection>) : Projection {
 
 fun CONCAT(vararg cat: Any?): Projection {
     val list = cat.filterNotNull()
-        .map(QueryBuilder::map2projections)
+        .map(::map2projections)
     return ConcatProjection(list)
+}
+
+fun map2projections(any:Any): Projection = when (any) {
+    is String -> StringProjection(any)
+    is Int -> StringProjection(any.toString())
+    is Float -> StringProjection(any.toString())
+    is Double -> StringProjection(any.toString())
+    is Projection -> any
+    else -> throw ProjectionException("Illegal source type: ${any::class.java}")
 }
