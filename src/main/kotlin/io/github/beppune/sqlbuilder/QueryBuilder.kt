@@ -9,6 +9,18 @@ interface SelectBuilder: SqlPart {
 }
 
 class QueryBuilder(val projections: List<Projection>) : SelectBuilder {
+
+    companion object {
+        fun map2projections(any:Any): Projection = when (any) {
+            is String -> StringProjection(any)
+            is Int -> StringProjection(any.toString())
+            is Float -> StringProjection(any.toString())
+            is Double -> StringProjection(any.toString())
+            is Projection -> any
+            else -> throw ProjectionException("Illegal source type: ${any::class.java}")
+        }
+    }
+
     override fun build(): String {
         return projections.joinToString(
             prefix = "SELECT ",
@@ -21,16 +33,7 @@ class QueryBuilder(val projections: List<Projection>) : SelectBuilder {
 
 fun select(vararg columns: Any?): SelectBuilder {
     val list:List<Projection> = columns.filterNotNull()
-        .map {
-            when (it) {
-                is String -> StringProjection(it)
-                is Int -> StringProjection(it.toString())
-                is Float -> StringProjection(it.toString())
-                is Double -> StringProjection(it.toString())
-                is Projection -> it
-                else -> throw ProjectionException("Illegal source type: ${it::class.java}")
-            }
-        }
+        .map(QueryBuilder::map2projections)
     return select(list)
 }
 
