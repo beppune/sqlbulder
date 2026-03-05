@@ -43,7 +43,7 @@ class QueryBuilder(
     }
 
     override fun from(t: String): JoinBuilder {
-        joins.add(0, Tablename(t))
+        joins.add(0, TableName(t))
         return this
     }
 
@@ -59,7 +59,7 @@ class QueryBuilder(
     }
 
     override fun join(right: String): JoinBuilder {
-        joins.add(Tablename(right))
+        joins.add(TableName(right))
         return this
     }
 

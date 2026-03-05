@@ -4,6 +4,6 @@ interface Join {
     fun build(): String
 }
 
-class Tablename(val name:String): Join {
+class TableName(val name:String): Join {
     override fun build(): String = name
 }
