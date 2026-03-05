@@ -1,5 +1,6 @@
 package it.github.beppune.unit
 
+import io.github.beppune.sqlbuilder.ON
 import io.github.beppune.sqlbuilder.select
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -34,6 +35,16 @@ class Joins {
         expected = "SELECT one, two, three FROM left JOIN right "
 
         assertEquals(expected, joins.build())
+    }
+
+    @Test
+    fun conditional() {
+        val join = select("one", "two", "three")
+            .from("left", "right" ON ("uid" to "user_id") )
+
+        val expected = "SELECT one, two, three FROM left JOIN right ON(uid=user_id) "
+
+        assertEquals(expected, join.build())
     }
 
 }
