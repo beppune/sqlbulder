@@ -13,6 +13,13 @@ import kotlin.test.assertFailsWith
 class Projections {
 
     @Test
+    fun nothing() {
+        val p = select()
+        val expected = "SELECT * "
+        assertEquals(expected, p.build())
+    }
+
+    @Test
     fun simple() {
 
         var p = select( "one",  "two",  "three" )

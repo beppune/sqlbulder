@@ -1,6 +1,7 @@
 package it.github.beppune.unit
 
 import io.github.beppune.sqlbuilder.select
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
