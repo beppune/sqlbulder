@@ -11,7 +11,7 @@ interface JoinBuilder: SqlPart {
 
 interface SelectBuilder: SqlPart {
     fun project(sb:StringBuilder)
-    fun from(t:String): JoinBuilder
+    fun from(vararg any:Any?): JoinBuilder
 }
 
 class QueryBuilder(
@@ -42,8 +42,8 @@ class QueryBuilder(
 
     }
 
-    override fun from(t: String): JoinBuilder {
-        joins.add(0, TableName(t))
+    override fun from(vararg any:Any?): JoinBuilder {
+        any.filterNotNull().map(::map2join).also(joins::addAll)
         return this
     }
 
