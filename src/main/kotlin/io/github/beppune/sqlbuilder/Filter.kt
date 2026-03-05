@@ -8,6 +8,23 @@ class StringFilter(val s: String) : Filter {
     override fun build(): String = s.trim()
 }
 
+class LikeFilter(val left:String, val right: String) : Filter {
+    override fun build(): String = "$left LIKE '$right%'"
+}
+
+class InFilter(val left:String, val right:List<String>) : Filter {
+    override fun build(): String = right.joinToString(
+        prefix = "$left IN(",
+        separator = ", ",
+        postfix = ")",
+        transform = { "'$it'" }
+    )
+}
+
+infix fun String.LIKE(right:String) = LikeFilter(this, right)
+
+infix fun String.IN(right: List<String>) = InFilter(this, right)
+
 fun map2filter(any: Any): Filter = when(any) {
     is String -> StringFilter(any)
     is Filter -> any
