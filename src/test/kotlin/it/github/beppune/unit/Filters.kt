@@ -5,6 +5,7 @@ import io.github.beppune.sqlbuilder.IN
 import io.github.beppune.sqlbuilder.LIKE
 import io.github.beppune.sqlbuilder.NOT
 import io.github.beppune.sqlbuilder.ON
+import io.github.beppune.sqlbuilder.OR
 import io.github.beppune.sqlbuilder.select
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -81,6 +82,16 @@ class Filters {
                 )
             )
         val expected = "SELECT one, two, three FROM users WHERE EXISTS(SELECT 1 FROM table WHERE store LIKE 'ASTORE%' AND city LIKE 'London%' ) "
+
+        assertEquals(expected, p.build())
+    }
+
+    @Test
+    fun or() {
+        val p = select("one", "two", "three")
+            .from("table")
+            .where( OR( "uid" LIKE "UID", "uid" IN listOf("ONE", "TWO", "THREE") ) )
+        val expected = "SELECT one, two, three FROM table WHERE (uid LIKE 'UID%' OR uid IN('ONE', 'TWO', 'THREE')) "
 
         assertEquals(expected, p.build())
     }
