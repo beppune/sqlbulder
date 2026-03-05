@@ -4,9 +4,15 @@ interface SqlPart {
     fun build(): String
 }
 
+interface WhereBuilder: SqlPart {
+    fun filter(sb: StringBuilder)
+}
+
 interface JoinBuilder: SqlPart {
     fun join(sb: StringBuilder)
     fun join(right:String): JoinBuilder
+
+    fun where(vararg any: Any?): JoinBuilder
 }
 
 interface SelectBuilder: SqlPart {
@@ -17,12 +23,14 @@ interface SelectBuilder: SqlPart {
 class QueryBuilder(
     val projections: List<Projection>,
     val joins: MutableList<Join> = mutableListOf(),
-    ) : SelectBuilder, JoinBuilder {
+    val filters: MutableList<Filter> = mutableListOf(),
+    ) : SelectBuilder, JoinBuilder, WhereBuilder {
 
     override fun build(): String {
         val sb = StringBuilder()
         project(sb)
         join(sb)
+        filter(sb)
         return sb.toString()
     }
 
@@ -60,6 +68,22 @@ class QueryBuilder(
 
     override fun join(right: String): JoinBuilder {
         joins.add(TableName(right))
+        return this
+    }
+
+    override fun filter(sb: StringBuilder) {
+        if( filters.isNotEmpty() ) {
+            filters.joinToString(
+                prefix = "WHERE ",
+                separator = " AND ",
+                postfix = " ",
+                transform = Filter::build
+            ).also(sb::append)
+        }
+    }
+
+    override fun where(vararg any: Any?): JoinBuilder {
+        any.filterNotNull().map(::map2filter).also(filters::addAll)
         return this
     }
 
