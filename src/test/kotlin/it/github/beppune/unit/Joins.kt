@@ -18,4 +18,15 @@ class Joins {
 
     }
 
+    @Test
+    fun simlejoin() {
+        val joins = select("one", "two", "three")
+            .from("table")
+                .join("right")
+
+        val expected = "SELECT one, two, three FROM table JOIN right "
+
+        assertEquals(expected, joins.build())
+    }
+
 }

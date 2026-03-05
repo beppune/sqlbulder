@@ -6,6 +6,7 @@ interface SqlPart {
 
 interface JoinBuilder: SqlPart {
     fun join(sb: StringBuilder)
+    fun join(right:String): JoinBuilder
 }
 
 interface SelectBuilder: SqlPart {
@@ -50,12 +51,18 @@ class QueryBuilder(
         if( joins.isNotEmpty() ) {
             joins.joinToString(
                 prefix = "FROM ",
-                separator = "JOIN ",
+                separator = " JOIN ",
                 postfix = " ",
                 transform = Join::build
             ).also(sb::append)
         }
     }
+
+    override fun join(right: String): JoinBuilder {
+        joins.add(Tablename(right))
+        return this
+    }
+
 }
 
 fun select(vararg columns: Any?): SelectBuilder {
