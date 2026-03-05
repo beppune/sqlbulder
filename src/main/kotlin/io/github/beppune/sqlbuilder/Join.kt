@@ -1,8 +1,5 @@
 package io.github.beppune.sqlbuilder
 
-import jdk.internal.net.http.common.Pair.pair
-import sun.tools.jconsole.Tab
-
 interface Join {
     fun build(): String
 }
