@@ -2,6 +2,7 @@ package it.github.beppune.unit
 
 import io.github.beppune.sqlbuilder.IN
 import io.github.beppune.sqlbuilder.LIKE
+import io.github.beppune.sqlbuilder.NOT
 import io.github.beppune.sqlbuilder.ON
 import io.github.beppune.sqlbuilder.select
 import org.junit.jupiter.api.Test
@@ -54,6 +55,17 @@ class Filters {
             .where( "uid" LIKE "UID", "uid" IN listOf("ONE", "TWO", "THREE") )
 
         val expected = "SELECT one, two, three FROM left JOIN right ON(uid=user_id) WHERE uid LIKE 'UID%' AND uid IN('ONE', 'TWO', 'THREE') "
+        assertEquals(expected, p.build())
+    }
+
+    @Test
+    fun not() {
+        val p = select("one", "two", "three")
+            .from("table")
+            .where( NOT( "uid" LIKE "UID" ) )
+
+        val expected = "SELECT one, two, three FROM table WHERE NOT(uid LIKE 'UID%') "
+
         assertEquals(expected, p.build())
     }
 
