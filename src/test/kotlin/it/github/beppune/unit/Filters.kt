@@ -1,5 +1,6 @@
 package it.github.beppune.unit
 
+import io.github.beppune.sqlbuilder.EXISTS
 import io.github.beppune.sqlbuilder.IN
 import io.github.beppune.sqlbuilder.LIKE
 import io.github.beppune.sqlbuilder.NOT
@@ -65,6 +66,21 @@ class Filters {
             .where( NOT( "uid" LIKE "UID" ) )
 
         val expected = "SELECT one, two, three FROM table WHERE NOT(uid LIKE 'UID%') "
+
+        assertEquals(expected, p.build())
+    }
+
+    @Test
+    fun exists() {
+        val p = select("one", "two", "three")
+            .from("users")
+            .where(
+                EXISTS(
+                    select(1).from("table")
+                        .where( "store" LIKE "ASTORE", "city" LIKE "London")
+                )
+            )
+        val expected = "SELECT one, two, three FROM users WHERE EXISTS(SELECT 1 FROM table WHERE store LIKE 'ASTORE%' AND city LIKE 'London%' ) "
 
         assertEquals(expected, p.build())
     }

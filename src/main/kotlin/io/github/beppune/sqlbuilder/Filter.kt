@@ -21,6 +21,10 @@ class InFilter(val left:String, val right:List<String>) : Filter {
     )
 }
 
+class ExistsInSubqueryFilter(val subquery: JoinBuilder) : Filter {
+    override fun build(): String = "EXISTS(${subquery.build()})"
+}
+
 class NotFilter(val filter:Filter) : Filter {
     override fun build(): String = "NOT(${filter.build()})"
 }
@@ -30,6 +34,8 @@ infix fun String.LIKE(right:String) = LikeFilter(this, right)
 infix fun String.IN(right: List<String>) = InFilter(this, right)
 
 fun NOT(f:Filter): Filter = NotFilter(f)
+
+fun EXISTS(sub: JoinBuilder): Filter = ExistsInSubqueryFilter(sub)
 
 fun map2filter(any: Any): Filter = when(any) {
     is String -> StringFilter(any)
