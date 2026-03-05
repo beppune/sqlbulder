@@ -4,11 +4,13 @@ interface SqlPart {
     fun build(): String
 }
 
+interface JoinBuilder: SqlPart
+
 interface SelectBuilder: SqlPart {
-    override fun build(): String
+    fun from(t:String): JoinBuilder
 }
 
-class QueryBuilder(val projections: List<Projection>) : SelectBuilder {
+class QueryBuilder(val projections: List<Projection>) : SelectBuilder, JoinBuilder {
 
     override fun build(): String {
         return projections.joinToString(
@@ -17,6 +19,10 @@ class QueryBuilder(val projections: List<Projection>) : SelectBuilder {
             postfix = " ",
             transform = Projection::build
         )
+    }
+
+    override fun from(t: String): JoinBuilder {
+        return this
     }
 }
 
