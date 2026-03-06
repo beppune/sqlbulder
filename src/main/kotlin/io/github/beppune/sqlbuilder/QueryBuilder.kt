@@ -6,12 +6,13 @@ interface SqlPart {
 
 interface SortBuilder: SqlPart {
     fun sort(sb: StringBuilder)
+    fun desc(): SortBuilder
 }
 
 interface WhereBuilder: SqlPart {
     fun filter(sb: StringBuilder)
 
-    fun orderby(vararg s:String, asc: Boolean = true): SortBuilder
+    fun orderby(vararg s:String): SortBuilder
 }
 
 interface JoinBuilder: SqlPart {
@@ -91,9 +92,8 @@ class QueryBuilder(
         }
     }
 
-    override fun orderby(vararg s: String, asc: Boolean): SortBuilder {
+    override fun orderby(vararg s: String): SortBuilder {
         sorts.addAll(s)
-        this.asc = asc
         return this
     }
 
@@ -104,12 +104,20 @@ class QueryBuilder(
 
     override fun sort(sb: StringBuilder) {
         if(sorts.isNotEmpty()) {
+
+            val postfix = if (asc) " ASC " else " DESC "
+
             sorts.joinToString(
                 prefix = "ORDER BY ",
                 separator = ", ",
-                postfix = " ",
+                postfix = postfix,
             ).also(sb::append)
         }
+    }
+
+    override fun desc(): SortBuilder {
+        asc = false
+        return this
     }
 
 }
