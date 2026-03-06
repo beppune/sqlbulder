@@ -21,7 +21,7 @@ class InFilter(val left:String, val right:List<String>) : Filter {
     )
 }
 
-class ExistsInSubqueryFilter(val subquery: JoinBuilder) : Filter {
+class ExistsInSubqueryFilter(val subquery: SqlPart) : Filter {
     override fun build(): String = "EXISTS(${subquery.build()})"
 }
 
@@ -39,7 +39,7 @@ infix fun String.IN(right: List<String>) = InFilter(this, right)
 
 fun NOT(f:Filter): Filter = NotFilter(f)
 
-fun EXISTS(sub: JoinBuilder): Filter = ExistsInSubqueryFilter(sub)
+fun EXISTS(sub: SqlPart): Filter = ExistsInSubqueryFilter(sub)
 
 fun OR(left: Filter, right: Filter): Filter = OrFilter(left, right)
 

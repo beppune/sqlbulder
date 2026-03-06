@@ -4,15 +4,21 @@ interface SqlPart {
     fun build(): String
 }
 
+interface SortBuilder: SqlPart {
+    fun sort(sb: StringBuilder)
+}
+
 interface WhereBuilder: SqlPart {
     fun filter(sb: StringBuilder)
+
+    fun orderby(vararg s:String, asc: Boolean = true): SortBuilder
 }
 
 interface JoinBuilder: SqlPart {
     fun join(sb: StringBuilder)
     fun join(right:String): JoinBuilder
 
-    fun where(vararg any: Any?): JoinBuilder
+    fun where(vararg any: Any?): WhereBuilder
 }
 
 interface SelectBuilder: SqlPart {
@@ -24,13 +30,16 @@ class QueryBuilder(
     val projections: List<Projection>,
     val joins: MutableList<Join> = mutableListOf(),
     val filters: MutableList<Filter> = mutableListOf(),
-    ) : SelectBuilder, JoinBuilder, WhereBuilder {
+    val sorts: MutableList<String> = mutableListOf(),
+    var asc: Boolean = true,
+    ) : SelectBuilder, JoinBuilder, WhereBuilder, SortBuilder {
 
     override fun build(): String {
         val sb = StringBuilder()
         project(sb)
         join(sb)
         filter(sb)
+        sort(sb)
         return sb.toString()
     }
 
@@ -82,9 +91,25 @@ class QueryBuilder(
         }
     }
 
-    override fun where(vararg any: Any?): JoinBuilder {
+    override fun orderby(vararg s: String, asc: Boolean): SortBuilder {
+        sorts.addAll(s)
+        this.asc = asc
+        return this
+    }
+
+    override fun where(vararg any: Any?): WhereBuilder {
         any.filterNotNull().map(::map2filter).also(filters::addAll)
         return this
+    }
+
+    override fun sort(sb: StringBuilder) {
+        if(sorts.isNotEmpty()) {
+            sorts.joinToString(
+                prefix = "ORDER BY ",
+                separator = ", ",
+                postfix = " ",
+            ).also(sb::append)
+        }
     }
 
 }
